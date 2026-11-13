@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><title>Home – Frantech Ajo</title><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "tertiary": "#40505a", "primary-fixed": "#dde1ff", "on-secondary-fixed-variant": "#005235", "surface-bright": "#faf8ff", "tertiary-container": "#576872", "surface-container-low": "#f2f3ff", "on-tertiary": "#ffffff", "on-tertiary-fixed-variant": "#384953", "on-secondary": "#ffffff", "background": "#faf8ff", "error": "#ba1a1a", "tertiary-fixed-dim": "#b7c9d5", "secondary-container": "#6af9b7", "surface-container": "#eaedff", "outline": "#737688", "on-error": "#ffffff", "secondary-fixed": "#6dfcba", "surface-dim": "#d2d9f4", "primary-container": "#0052ff", "surface-container-highest": "#dae2fd", "surface-variant": "#dae2fd", "surface-container-high": "#e2e7ff", "on-error-container": "#93000a", "primary-fixed-dim": "#b7c4ff", "on-tertiary-fixed": "#0c1e26", "surface": "#faf8ff", "on-primary-fixed": "#001452", "on-surface": "#131b2e", "inverse-on-surface": "#eef0ff", "on-tertiary-container": "#d5e7f3", "inverse-primary": "#b7c4ff", "surface-tint": "#004ced", "on-secondary-fixed": "#002113", "primary": "#003ec7", "inverse-surface": "#283044", "on-primary-fixed-variant": "#0038b6", "outline-variant": "#c3c5d9", "on-background": "#131b2e", "error-container": "#ffdad6", "surface-container-lowest": "#ffffff", "on-primary-container": "#dfe3ff", "on-primary": "#ffffff", "secondary": "#006c47", "secondary-fixed-dim": "#4cdf9f", "on-surface-variant": "#434656", "on-secondary-container": "#00714b", "tertiary-fixed": "#d3e5f1" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xs": "0.25rem", "space-md": "1rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "gutter": "1rem", "margin": "1.25rem", "space-xl": "2rem" }, "fontFamily": { "currency-display": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "label-lg": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "headline-lg": ["Plus Jakarta Sans"], "body-sm": ["Inter"], "headline-xl": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "body-md": ["Inter"], "label-sm": ["Inter"] }, "fontSize": { "currency-display": ["30px", { "lineHeight": "36px", "fontWeight": "800" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "18px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "headline-lg": ["26px", { "lineHeight": "34px", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-xl": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }] } } } }</script><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100%;}.pb-safe{padding-bottom:calc(env(safe-area-inset-bottom,0px));}.pt-safe{padding-top:calc(env(safe-area-inset-top,0px));}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+  </head><body class="invisible bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen selection:bg-primary-fixed selection:text-on-primary-fixed"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl pt-safe shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]"><div class="h-16 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="Frantech Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ALJJyrCWIwZYu8WsSg2yh970qxCgY89l0fG4WovWgx3NjH2mjv4uH5ygEd_8WwHk05Kp1XRnqquPv4coh3HrfSUARI0dwaR2yAYzEGO53MVqAm_FjurmWTzNXA52qHO-Xb4SZYHJrf9EahJILCdjMQl6CBwIFV-TDxpUJpI-ffWdIj2CeDT5c63RQG71HaxYjctHdmQ2wGgqvqg-JF1aD7u7pVwaul1z_rqMHcliFJ1F-JMdMQ"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-on-surface leading-tight">Home</span><span class="font-label-sm text-label-sm text-on-surface-variant leading-none">Frantech Cooperative</span></div></div><div class="flex items-center gap-space-sm"><button aria-label="Notifications" class="relative w-11 h-11 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[24px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></button><a aria-label="User Profile" class="w-11 h-11 rounded-full p-0.5 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary" data-path="profile" href="#"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdBAOcWKVBoLQTiUc9Tr_5OucpYONhUgbZnpUiouEOawBR2Jr62WKHTM2M1NSgVsx9G8WCqgtNFeop2D4LFz2FjBPEfOPUXQzQPCNfP4tYoN89tjkpFZp4HoleUU43uHv1idR9TfAZqufXkX8Sx_UZWdgXUrTRmOtSL2Tbuat2agTj0ZoFsgql39n8JxlG56v8oGrlEVl2ShRNBD8_cOhCwps6cwNEJpZbq9O449Iq"/></a></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-28 bg-surface px-margin"><div class="flex flex-col w-full gap-space-lg pb-6">
+<!-- Greeting Header Section -->
+<section class="flex flex-col pt-1">
+<span class="font-label-md text-label-md text-on-surface-variant font-medium" id="greet">Good Morning,</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-0.5 flex items-center gap-1.5">
+<span id="userName">Member</span>
+<span class="text-xl select-none animate-pulse">👋</span>
+</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+      Keep saving, your goals are closer than you think!
+    </p>
+</section>
+<!-- Hero Card: Total Contribution with Balance Toggle -->
+<section class="relative w-full rounded-2xl bg-gradient-to-br from-primary-container via-primary to-[#002f9c] text-on-primary p-space-md shadow-[0_12px_30px_-6px_rgba(0,82,255,0.35)] overflow-hidden">
+<div class="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+<div class="absolute -left-10 -bottom-10 w-40 h-40 rounded-full bg-secondary-fixed/15 blur-xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-md text-label-md text-on-primary-container font-medium tracking-wide">Total Contribution</span>
+<button aria-label="Toggle contribution balance visibility" class="p-1 rounded-full text-on-primary-container hover:text-on-primary hover:bg-white/10 active:scale-95 transition-all flex items-center justify-center" id="toggleBalanceBtn" type="button">
+<span class="material-symbols-outlined text-[18px]" id="eyeIcon">visibility</span>
+</button>
+</div>
+<div class="flex items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+<span class="material-symbols-outlined text-white/60 text-[20px]">chevron_right</span>
+</div>
+</div>
+<div class="flex items-baseline">
+<span class="font-currency-display text-currency-display text-on-primary tracking-tight select-none" id="balanceText">
+          ₦240,000
+        </span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 backdrop-blur-md">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-ping"></span>
+<span class="font-label-sm text-label-sm text-on-primary font-medium">Active Groups: 3</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-primary-container font-medium flex items-center gap-0.5">
+<span>Cycles healthy</span>
+<span class="material-symbols-outlined text-[14px]">verified</span>
+</span>
+</div>
+</div>
+</section>
+<!-- 4 Quick Actions Grid -->
+<section class="grid grid-cols-4 gap-space-xs px-0.5">
+<a class="group flex flex-col items-center gap-1.5 text-center transition-transform active:scale-95" data-path="groups" href="#">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-low shadow-[0_4px_16px_-2px_rgba(15,23,42,0.06)] flex items-center justify-center text-primary group-hover:bg-primary-container group-hover:text-on-primary transition-all duration-200">
+<span class="material-symbols-outlined text-[26px]">person_add</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold leading-tight">Join Group</span>
+</a>
+<a class="group flex flex-col items-center gap-1.5 text-center transition-transform active:scale-95" data-path="groups" href="#">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-low shadow-[0_4px_16px_-2px_rgba(15,23,42,0.06)] flex items-center justify-center text-primary group-hover:bg-primary-container group-hover:text-on-primary transition-all duration-200">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">groups</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold leading-tight">Create Group</span>
+</a>
+<a class="group flex flex-col items-center gap-1.5 text-center transition-transform active:scale-95" data-path="groups" href="#">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-low shadow-[0_4px_16px_-2px_rgba(15,23,42,0.06)] flex items-center justify-center text-primary group-hover:bg-primary-container group-hover:text-on-primary transition-all duration-200">
+<span class="material-symbols-outlined text-[26px]">diversity_3</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold leading-tight">My Groups</span>
+</a>
+<a class="group flex flex-col items-center gap-1.5 text-center transition-transform active:scale-95" data-path="wallet" href="#">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-low shadow-[0_4px_16px_-2px_rgba(15,23,42,0.06)] flex items-center justify-center text-primary group-hover:bg-primary-container group-hover:text-on-primary transition-all duration-200">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold leading-tight">Wallet</span>
+</a>
+</section>
+<!-- Promotional Banner -->
+<section class="relative w-full rounded-2xl overflow-hidden bg-inverse-surface text-inverse-on-surface shadow-[0_6px_22px_-4px_rgba(19,27,46,0.12)]">
+<div class="flex items-stretch min-h-[96px]">
+<div class="flex-1 p-space-md flex flex-col justify-between z-10">
+<div class="flex flex-col gap-0.5">
+<p class="font-headline-sm text-headline-sm text-inverse-on-surface leading-snug">
+            Build Your Future
+          </p>
+<p class="font-label-sm text-label-sm text-primary-fixed-dim leading-snug">
+            One Contribution at a Time
+          </p>
+</div>
+<div class="flex items-center gap-1 pt-1.5">
+<span class="material-symbols-outlined text-secondary-fixed text-[16px]" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold tracking-wide">Frantech Ajo Trust</span>
+</div>
+</div>
+<div class="relative w-36 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up photograph of diverse Nigerian community hands touching a miniature Nigerian green and white flag banner on a sunny wooden savings table, natural morning light, vibrant emerald and clean tones, 8k crisp details" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGppTCs__E8cNcSEhpaHyfhWLqde8pXUzQ06jCnsznxSxyKkzpErsROJAM0AB3XkCTkyveTlckhvNHMAFA_ptjkRke-P2cD7fteYoE-R8wFNhBocOhqG8a34LAJL2L7bfE8OLIuzwjoTH6A5RJrY3gRr2T-EmSMbFESzi9I2mLTVA7EZ8xqTeQW_272nxGxRZa8m_qjeA6r4-DpXssqhbsUZr6aa50lJE8ro3VJY6z"/>
+<div class="absolute inset-0 bg-gradient-to-r from-inverse-surface via-inverse-surface/40 to-transparent"></div>
+</div>
+</div>
+</section>
+<!-- Popular Groups Section -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Popular Groups</h2>
+<a class="font-label-md text-label-md text-primary font-semibold hover:underline flex items-center gap-0.5" data-path="groups" href="#">
+<span>See All</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Card 1: Land Purchase Ajo -->
+<div class="w-full rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_4px_18px_-2px_rgba(15,23,42,0.05)] transition-all hover:shadow-[0_8px_24px_-4px_rgba(0,82,255,0.12)]">
+<div class="flex items-start gap-space-md">
+<div class="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A modern suburban duplex home with clean green lawn, contemporary Nigerian residential architectural design, sunny bright blue sky, high realism" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1lTWobq9Jh-DumAt_f2axYrB5KmqPiN2ezUZ_CWQm31nqMYtAhtpX7qFmye2rGEFEdlTOKnZraVsl4FnjDh1hZ7_WjHgEB-nuzdF1Zhw8yHeBFsNBQXyaIII2demqoYk4cNRqwVp2oXsPro2J1iviz53dXiRVixjAdkC_wUVKbtCHO_FdHZk47M7MAJVoXBim4J8DqgeXVTpJ66Qp8-BVONsp4ZqeYK7nr8m-trZf"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Land Purchase Ajo</h3>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-secondary-fixed/40 text-on-secondary-fixed-variant font-label-sm text-label-sm font-semibold shrink-0">
+                Active
+              </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              ₦5,000,000 <span class="text-outline">•</span> 12 Months
+            </p>
+<div class="mt-2.5 flex items-center gap-space-sm">
+<div class="flex-1 h-2 rounded-full bg-surface-container overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 32%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-semibold shrink-0">32%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Business Capital Ajo -->
+<div class="w-full rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_4px_18px_-2px_rgba(15,23,42,0.05)] transition-all hover:shadow-[0_8px_24px_-4px_rgba(0,82,255,0.12)]">
+<div class="flex items-start gap-space-md">
+<div class="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Energetic young Nigerian entrepreneurs collaborating over laptops in a modern Lagos tech hub office, warm ambient lighting, corporate professional atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1XX8QeSFDDvzfEq3qhOW7jLzA__BTglYTUh8wamGKyE1HlaSMbtYJ4LPDmCqBjpR9304Lwm-78FD8gndDgSyqV8IztX56uQ1tu5k5b1X-C_pYDFqSygzvgQkJCgpNy5XLauJT7dx4dwd9qXAM1Dxiybp2YQsqS9uhsQntRsVJIdC9EZ4_oad7Ci268JZ4jlPapzeAnBolF-wv1EXJxLpXCndZMMVWOJsEVBRVr14t"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Business Capital Ajo</h3>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-secondary-fixed/40 text-on-secondary-fixed-variant font-label-sm text-label-sm font-semibold shrink-0">
+                Active
+              </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              ₦2,000,000 <span class="text-outline">•</span> 10 Months
+            </p>
+<div class="mt-2.5 flex items-center gap-space-sm">
+<div class="flex-1 h-2 rounded-full bg-surface-container overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 45%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-semibold shrink-0">45%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3: School Fees Ajo -->
+<div class="w-full rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_4px_18px_-2px_rgba(15,23,42,0.05)] transition-all hover:shadow-[0_8px_24px_-4px_rgba(0,82,255,0.12)]">
+<div class="flex items-start gap-space-md">
+<div class="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Academic graduation cap lying proudly over a stack of hardcover books and study scrolls with golden ambient university lighting, symbol of academic excellence and success" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8PQ--nbJtRqfeQugryPfz09mQuhtEUGbcxuj3qma-2NESIuvA5u-E5UuCZmWm2AlTPaeEnL3u-XtSOoTYoKFl5yVMR0p7luN5AcaU4FgZJspBGd7JtoEpXLZNbVgv8_Ig62JwW21gePD7aBb0Hbc7CvfaQhITFEqrjPuTj8WDlKOGvYg21rBUW5gHiLSn_CevvuxSEixBpK7Kf532-t3l6QYHUI_I_E7EyCRACGH0"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">School Fees Ajo</h3>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-secondary-fixed/40 text-on-secondary-fixed-variant font-label-sm text-label-sm font-semibold shrink-0">
+                Active
+              </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+              ₦1,000,000 <span class="text-outline">•</span> 10 Months
+            </p>
+<div class="mt-2.5 flex items-center gap-space-sm">
+<div class="flex-1 h-2 rounded-full bg-surface-container overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 80%;"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-semibold shrink-0">80%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+  (function initDashboardInteractions() {
+    const toggleBtn = document.getElementById('toggleBalanceBtn');
+    const balanceText = document.getElementById('balanceText');
+    const eyeIcon = document.getElementById('eyeIcon');
+    
+    let isVisible = true;
+    const realBalance = '₦240,000';
+    const hiddenBalance = '₦ • • • • • •';
+
+    if (toggleBtn && balanceText && eyeIcon) {
+      toggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        isVisible = !isVisible;
+        
+        if (isVisible) {
+          balanceText.textContent = realBalance;
+          eyeIcon.textContent = 'visibility';
+          toggleBtn.setAttribute('aria-label', 'Hide contribution balance');
+        } else {
+          balanceText.textContent = hiddenBalance;
+          eyeIcon.textContent = 'visibility_off';
+          toggleBtn.setAttribute('aria-label', 'Show contribution balance');
+        }
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe pointer-events-none" data-active-classes="text-primary font-label-md"><div class="max-w-md mx-auto px-margin pb-space-sm pointer-events-auto"><div class="h-16 rounded-full bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_10px_25px_-4px_rgba(0,82,255,0.18)] flex items-center justify-around px-space-sm"><a aria-current="page" class="flex flex-col items-center justify-center w-12 h-12 rounded-full transition-colors text-primary font-label-md" data-path="home" href="#"><span class="material-symbols-outlined text-[24px]">home</span><span class="font-label-sm text-label-sm mt-0.5">Home</span></a><a class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-on-surface-variant hover:text-primary transition-colors" data-path="groups" href="#"><span class="material-symbols-outlined text-[24px]">group</span><span class="font-label-sm text-label-sm mt-0.5">Groups</span></a><div class="relative flex items-center justify-center"><a class="-top-5 absolute w-14 h-14 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-[0_10px_25px_-4px_rgba(0,82,255,0.4)] hover:bg-primary transition-transform active:scale-95" data-path="quick-action" href="#"><span class="material-symbols-outlined text-[30px]">add</span></a></div><a class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-on-surface-variant hover:text-primary transition-colors" data-path="wallet" href="#"><span class="material-symbols-outlined text-[24px]">account_balance_wallet</span><span class="font-label-sm text-label-sm mt-0.5">Wallet</span></a><a class="flex flex-col items-center justify-center w-12 h-12 rounded-full text-on-surface-variant hover:text-primary transition-colors" data-path="profile" href="#"><span class="material-symbols-outlined text-[24px]">person</span><span class="font-label-sm text-label-sm mt-0.5">Profile</span></a></div></div></nav>
+
+<!-- Account sheet (opens from the Profile icon / tab) -->
+<div id="sheetBg" class="fixed inset-0 z-[60] bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+<div id="sheet" class="fixed bottom-0 inset-x-0 z-[70] max-w-md mx-auto rounded-t-3xl bg-surface-container-lowest px-margin pt-space-md pb-safe shadow-2xl translate-y-full transition-transform duration-300">
+  <div class="w-10 h-1 rounded-full bg-outline-variant mx-auto mb-space-md"></div>
+  <p class="font-headline-sm text-headline-sm text-on-surface" id="sName">Account</p>
+  <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md" id="sEmail"></p>
+  <div class="flex flex-col gap-space-sm pb-space-md">
+    <div id="bioOffer" class="hidden rounded-2xl bg-surface-container-low p-space-md">
+      <p class="font-label-lg text-label-lg text-on-surface">Log in faster next time</p>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 mb-space-sm">Use Face ID or your fingerprint instead of your password.</p>
+      <button id="bioOn" type="button" class="w-full h-11 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg active:scale-[0.98] transition-transform">Turn on Face ID / fingerprint</button>
+    </div>
+    <button id="bioOff" type="button" class="hidden w-full h-12 rounded-full bg-surface-container-low text-on-surface font-label-lg text-label-lg">Turn off Face ID / fingerprint</button>
+    <p id="sMsg" class="font-body-sm text-body-sm min-h-[16px]"></p>
+    <button id="lockBtn" type="button" class="w-full h-12 rounded-full border border-primary text-primary font-label-lg text-label-lg">Lock app</button>
+    <button id="outBtn" type="button" class="w-full h-12 rounded-full border border-error text-error font-label-lg text-label-lg">Log out</button>
+    <button id="closeSheet" type="button" class="w-full h-10 text-on-surface-variant font-label-md text-label-md">Close</button>
+  </div>
+</div>
+
+<script>
+(async () => {
+  const $ = id => document.getElementById(id);
+  const {data:{session}} = await sb.auth.getSession();
+  if (!session) return location.replace('login.html');
+  const user = session.user;
+  // With Face ID / fingerprint on, the app must be unlocked first
+  if (bio.enabledFor(user.id) && sessionStorage.getItem('frantech_unlocked') !== '1') return location.replace('login.html');
+
+  // Greeting + name
+  const h = new Date().getHours();
+  $('greet').textContent = (h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening') + ',';
+  const {data:p} = await sb.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
+  const name = (p && p.full_name) || (user.user_metadata && user.user_metadata.full_name) || 'Member';
+  $('userName').textContent = name;
+  $('sName').textContent = name; $('sEmail').textContent = user.email || '';
+  document.body.classList.remove('invisible');
+
+  // Account sheet
+  const say = (t, ok) => { $('sMsg').textContent = t; $('sMsg').className = 'font-body-sm text-body-sm min-h-[16px] ' + (ok ? 'text-secondary' : 'text-error'); };
+  const canBio = await bio.supported();
+  function refreshBio() {
+    const on = bio.enabledFor(user.id);
+    $('bioOffer').classList.toggle('hidden', !(canBio && !on));
+    $('bioOff').classList.toggle('hidden', !(canBio && on));
+  }
+  function openSheet() { refreshBio(); say(''); $('sheetBg').classList.remove('opacity-0','pointer-events-none'); $('sheet').classList.remove('translate-y-full'); }
+  function closeSheet() { $('sheetBg').classList.add('opacity-0','pointer-events-none'); $('sheet').classList.add('translate-y-full'); }
+  document.querySelectorAll('[data-path="profile"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openSheet(); }));
+  $('sheetBg').onclick = $('closeSheet').onclick = closeSheet;
+
+  $('bioOn').onclick = async () => {
+    try { await bio.enable(user); sessionStorage.setItem('frantech_unlocked','1'); say('Face ID / fingerprint is on.', true); refreshBio(); }
+    catch (e) { say('Could not turn it on. Check that your phone has Face ID or a fingerprint set up.'); }
+  };
+  $('bioOff').onclick = () => { bio.clear(); say('Face ID / fingerprint is off.', true); refreshBio(); };
+  // Lock keeps you signed in but asks for Face ID / fingerprint again
+  $('lockBtn').onclick = () => { sessionStorage.removeItem('frantech_unlocked'); location.href = 'login.html'; };
+  // Log out signs out fully and removes biometrics from this device
+  $('outBtn').onclick = async () => { await sb.auth.signOut(); bio.clear(); sessionStorage.removeItem('frantech_unlocked'); location.href = 'index.html'; };
+
+  // Offer Face ID / fingerprint once, right after the first login on this device
+  if (canBio && !bio.enabledFor(user.id) && !localStorage.getItem('frantech_bio_asked')) {
+    localStorage.setItem('frantech_bio_asked', '1');
+    setTimeout(openSheet, 900);
+  }
+})();
+</script>
+</body></html>
