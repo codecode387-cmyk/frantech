@@ -49,11 +49,6 @@ input:focus{border-color:#0052FF;box-shadow:0 0 0 3px rgba(0,82,255,.18)}
     <button class="link" id="forgot" type="button">Forgot password?</button>
   </form>
 
-  <form id="rf" class="hide" novalidate>
-    <input id="np" type="password" placeholder="New password (min. 8 characters)" autocomplete="new-password"/>
-    <p class="msg" id="rmsg" role="status"></p>
-    <button class="primary">Save new password</button>
-  </form>
   <p class="foot" id="foot">New here? <a href="signup.html">Create an account</a></p>
 </div>
 </main>
@@ -80,21 +75,9 @@ $("f").onsubmit=async e=>{
 $("forgot").onclick=async()=>{
   const email=$("email").value.trim();
   if(!email)return fail("Enter your email first, then tap Forgot password.");
-  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+"/login.html"});
+  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+"/reset-password.html"});
   error?fail(error.message):say("msg","Reset link sent. Check your email.",true);
 };
-// Set new password after opening the reset link
-sb.auth.onAuthStateChange(ev=>{if(ev==="PASSWORD_RECOVERY"){
-  $("f").classList.add("hide");$("bioBox").classList.add("hide");$("foot").classList.add("hide");
-  $("rf").classList.remove("hide");$("t").textContent="Set a new password";$("s").textContent="Choose a password you haven't used before."}});
-$("rf").onsubmit=async e=>{
-  e.preventDefault();const p=$("np").value;
-  if(p.length<8)return say("rmsg","Password must be at least 8 characters.");
-  const {error}=await sb.auth.updateUser({password:p});
-  if(error)return say("rmsg",error.message);
-  sessionStorage.setItem("frantech_unlocked","1");say("rmsg","Password updated. Redirecting…",true);setTimeout(enter,700);
-};
-
 // Biometric unlock
 async function tryBio(){
   say("bioMsg","");
@@ -105,7 +88,6 @@ $("bioBtn").onclick=tryBio;
 $("usePw").onclick=()=>{$("bioBox").classList.add("hide");$("f").classList.remove("hide")};
 
 (async()=>{
-  if(location.hash.includes("type=recovery"))return;
   const {data:{session}}=await sb.auth.getSession();
   if(!session)return;
   if(await bio.supported()&&bio.enabledFor(session.user.id)){
