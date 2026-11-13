@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/><title>Frantech Ajo</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#00319E}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:#fff;-webkit-tap-highlight-color:transparent}
+main{position:relative;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(#0052FF,#0047E0 55%,#00319E);padding-top:env(safe-area-inset-top,0);transition:opacity .35s,transform .35s}
+body.leaving main{opacity:0;transform:scale(.97)}
+.aura{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;animation:aura 8s ease-in-out infinite}
+@keyframes aura{50%{transform:scale(1.18);opacity:.6}}
+.stage{flex:1;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.brand{position:relative;width:min(92vw,420px);aspect-ratio:5/2;display:flex;align-items:center;justify-content:center}
+.orbit{position:absolute;inset:0;width:100%;height:100%;opacity:0;animation:fade 1s ease 1.1s forwards}
+@keyframes fade{to{opacity:1}}
+.word{position:relative;z-index:1;margin:0;font-size:clamp(34px,10.5vw,48px);font-weight:800;letter-spacing:-.02em;white-space:nowrap;perspective:600px}
+.word span{display:inline-block;opacity:0;transform-origin:50% 100%;
+  animation:letter .9s cubic-bezier(.2,.9,.2,1) forwards, glint 4.5s ease-in-out infinite;
+  animation-delay:calc(.25s + var(--i)*.07s), calc(1.8s + var(--i)*.09s)}
+@keyframes letter{from{opacity:0;transform:translateY(44px) rotateX(-85deg);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes glint{0%,60%,100%{color:#fff;text-shadow:none}72%{color:#6dfcba;text-shadow:0 0 18px rgba(109,252,186,.7)}}
+.line{position:absolute;z-index:1;left:50%;bottom:calc(50% - 44px);width:46%;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#6dfcba,transparent);transform:translateX(-50%) scaleX(0);animation:line .9s cubic-bezier(.2,.8,.2,1) 1.3s forwards}
+@keyframes line{to{transform:translateX(-50%) scaleX(1)}}
+.bottom{position:relative;z-index:2}
+.sky{height:90px;overflow:hidden;opacity:.3;position:relative}
+.sky svg{width:100%;height:100%;fill:#fff;transform:translateY(100%);animation:sky 1s cubic-bezier(.2,.8,.2,1) 1.1s forwards}
+@keyframes sky{to{transform:none}}
+.sky::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,#00319E,transparent)}
+.actions{display:flex;flex-direction:column;gap:12px;padding:6px 24px calc(22px + env(safe-area-inset-bottom,0));background:rgba(0,49,158,.85)}
+.btn{height:54px;border-radius:999px;display:flex;align-items:center;justify-content:center;font:700 15px 'Plus Jakarta Sans',sans-serif;text-decoration:none;opacity:0;transform:translateY(20px);animation:up .7s cubic-bezier(.2,.8,.2,1) forwards;transition:transform .2s}
+.btn:active{transform:scale(.98)}
+.btn.main{background:#fff;color:#003ec7;box-shadow:0 8px 24px rgba(0,0,0,.2);animation-delay:1.9s}
+.btn.alt{border:1.5px solid rgba(255,255,255,.55);color:#fff;animation-delay:2.05s}
+@keyframes up{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important}.orbit{display:none}}
+</style></head>
+<body>
+<main>
+  <div class="aura" style="top:-90px;right:-90px;width:320px;height:320px;background:rgba(109,252,186,.16)"></div>
+  <div class="aura" style="top:34%;left:-80px;width:280px;height:280px;background:rgba(221,225,255,.12);animation-delay:-3s"></div>
+
+  <div class="stage">
+    <div class="brand">
+      <!-- A savings circle: friends orbiting the name, one green dot = whose turn it is -->
+      <svg class="orbit" viewBox="0 0 400 160" fill="none" aria-hidden="true">
+        <ellipse cx="200" cy="80" rx="180" ry="58" stroke="#fff" stroke-opacity=".18" stroke-dasharray="3 7"/>
+        <g id="dots"></g>
+      </svg>
+      <h1 class="word" id="word" aria-label="Frantech Ajo">Frantech Ajo</h1>
+      <div class="line"></div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="sky"><svg preserveAspectRatio="none" viewBox="0 0 600 120">
+      <path d="M40 120 Q90 30 150 45 Q210 60 230 120Z"/><path d="M260 120 L275 80 Q310 65 345 80 L360 120Z"/><path d="M285 80 Q310 50 335 80Z"/>
+      <rect height="75" rx="2" width="22" x="380" y="45"/><rect height="90" rx="2" width="26" x="408" y="30"/><polygon points="421,12 418,30 424,30"/>
+      <rect height="65" rx="2" width="20" x="440" y="55"/><rect height="80" rx="2" width="30" x="470" y="40"/><rect height="60" rx="2" width="18" x="506" y="60"/><path d="M530 120 L545 70 L560 120Z"/>
+    </svg></div>
+    <div class="actions">
+      <a class="btn main" href="signup.html">Get Started</a>
+      <a class="btn alt" href="login.html">Log In</a>
+    </div>
+  </div>
+</main>
+<script>
+// Split the name into letters for the staggered flip-in
+var w=document.getElementById('word'),t=w.textContent;w.textContent='';
+[].forEach.call(t,function(c,i){var s=document.createElement('span');s.style.setProperty('--i',i);s.innerHTML=c===' '?'&nbsp;':c;w.appendChild(s)});
+// Orbiting dots (SMIL motion along the ellipse)
+var P='M20 80a180 58 0 1 0 360 0a180 58 0 1 0 -360 0',g='',N=7;
+for(var k=0;k<N;k++){var green=k===0;
+  g+='<circle r="'+(green?6:3.5)+'" fill="'+(green?'#6dfcba':'#fff')+'" fill-opacity="'+(green?1:.65)+'"'+(green?' style="filter:drop-shadow(0 0 6px #6dfcba)"':'')+'><animateMotion dur="14s" begin="-'+(k*14/N)+'s" repeatCount="indefinite" path="'+P+'"/></circle>';}
+document.getElementById('dots').innerHTML=g;
+// Fade out before navigating
+document.querySelectorAll('a.btn').forEach(function(a){a.addEventListener('click',function(e){
+  e.preventDefault();document.body.classList.add('leaving');setTimeout(function(){location.href=a.getAttribute('href')},300)})});
+</script>
+</body></html>
