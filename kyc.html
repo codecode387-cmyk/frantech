@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en"><head><title>Verify identity – Frantech Ajo</title>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script><script src="theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script><script src="app.js"></script>
+</head>
+<body class="invisible bg-surface font-body-md text-on-surface antialiased min-h-screen">
+<header id="hdr"></header>
+<main class="pt-16 pb-28 px-margin"><div id="view" class="flex flex-col gap-space-md pt-4"></div></main>
+<nav id="nav"></nav>
+<script>
+(async()=>{
+  const {profile,session}=await App.init({title:'Verify identity',active:'profile'});
+  const $=id=>document.getElementById(id), view=$('view');
+  const next=new URLSearchParams(location.search).get('next')||'groups.html';
+  const label={nin:'NIN',bvn:'BVN'};
+
+  function done(type,last4){
+    view.innerHTML='<div class="flex flex-col items-center text-center pt-10 gap-3"><div class="relative">'+App.tick()+'</div><h1 class="rise font-headline-lg text-headline-lg" style="--i:6">You are verified</h1><p class="rise font-body-md text-body-md text-on-surface-variant max-w-xs" style="--i:7">'+label[type]+' ending <strong>'+App.esc(last4||'••••')+'</strong> confirmed. You can now join any group.</p><a href="'+App.esc(next)+'" class="rise press mt-4 w-full h-[52px] rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-lg" style="--i:9">Browse groups<span class="material-symbols-outlined text-[20px]">arrow_forward</span></a></div>';
+  }
+  function pending(){
+    view.innerHTML='<div class="flex flex-col items-center text-center pt-10 gap-3"><div class="w-24 h-24 rounded-full bg-primary-fixed text-primary flex items-center justify-center pulse-ring"><span class="material-symbols-outlined text-[44px]">hourglass_top</span></div><h1 class="rise font-headline-lg text-headline-lg">Under review</h1><p class="rise font-body-md text-body-md text-on-surface-variant max-w-xs" style="--i:1">We received your details. This usually takes a short while. You will be able to join groups once it is approved.</p><button id="chk" class="rise press mt-3 w-full h-12 rounded-full border border-primary text-primary font-label-lg text-label-lg" style="--i:2" type="button">Check status</button></div>';
+    $('chk').onclick=async()=>{const {data}=await sb.from('profiles').select('kyc_status,kyc_type,kyc_last4').eq('id',App.user.id).maybeSingle();
+      if(data&&data.kyc_status==='verified')done(data.kyc_type,data.kyc_last4);else App.toast('Still under review.')};
+  }
+
+  if(profile.kyc_status==='verified')return done(profile.kyc_type,profile.kyc_last4);
+  if(profile.kyc_status==='pending')return pending();
+
+  // Form
+  let type='nin';
+  const hints={nin:'Dial *346# on the phone linked to your NIN to get it.',bvn:'Dial *565*0# on the phone linked to your bank to get your BVN.'};
+  view.innerHTML=
+   '<section class="rise rounded-xl bg-surface-container-low p-space-md flex gap-3" style="--i:0"><div class="p-2 rounded-lg bg-primary-fixed text-primary h-fit"><span class="material-symbols-outlined text-[22px]">verified_user</span></div><p class="font-body-md text-body-md font-medium leading-snug">Verify with your NIN or BVN to join pools above <span class="text-primary font-semibold">'+App.money(50000)+'</span> a month.</p></section>'+
+   (profile.kyc_status==='rejected'?'<section class="rise rounded-xl bg-error-container text-on-error-container p-space-md font-body-md text-body-md" style="--i:1"><strong>Last attempt failed.</strong> '+App.esc(profile.kyc_note||'Please check your details and try again.')+'</section>':'')+
+   '<section id="card" class="rise bg-surface-container-lowest rounded-xl p-space-md shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]" style="--i:2">'+
+    '<div class="relative grid grid-cols-2 p-1 rounded-full bg-surface-container-low mb-5"><div id="pill" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-primary-container shadow transition-transform duration-300"></div><button data-t="nin" class="relative z-10 py-2 font-label-md text-label-md transition-colors" type="button">NIN</button><button data-t="bvn" class="relative z-10 py-2 font-label-md text-label-md transition-colors" type="button">BVN</button></div>'+
+    '<label id="lbl" for="num" class="font-label-lg text-label-lg font-semibold"></label>'+
+    '<input id="num" inputmode="numeric" autocomplete="off" placeholder="0000 000 0000" class="mt-2 w-full h-14 px-4 rounded-xl bg-surface-container-low font-headline-md text-headline-md tracking-widest outline-none focus:ring-2 focus:ring-primary-container transition"/>'+
+    '<div class="mt-2 flex items-center gap-2"><div class="flex-1 h-1.5 rounded-full bg-surface-container overflow-hidden"><div id="prog" class="bar h-full bg-primary-container rounded-full" style="width:0"></div></div><span id="cnt" class="font-label-sm text-label-sm text-on-surface-variant w-9 text-right">0/11</span></div>'+
+    '<p id="hint" class="font-body-sm text-body-sm text-outline mt-2"></p>'+
+    '<div class="mt-4 rounded-lg bg-surface-container-low p-3 flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">badge</span><p class="font-body-sm text-body-sm text-on-surface-variant">The name on your ID must match <strong class="text-on-surface">'+App.esc(profile.full_name)+'</strong>.</p></div>'+
+    '<label class="mt-4 flex items-start gap-2 font-body-sm text-body-sm text-on-surface-variant"><input id="ok" type="checkbox" class="mt-0.5 accent-[#0052FF]"/>I agree that Frantech may check my details with the national identity database. My full number is not saved.</label>'+
+    '<p id="err" class="font-body-sm text-body-sm text-error min-h-[18px] mt-3"></p>'+
+    '<button id="go" class="press mt-1 w-full h-[52px] rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-[0_10px_25px_-4px_rgba(0,82,255,0.25)] transition-opacity" type="button" disabled>Verify identity</button>'+
+   '</section>'+
+   '<p class="rise flex items-center justify-center gap-1.5 text-outline font-body-sm text-body-sm text-center" style="--i:3"><span class="material-symbols-outlined text-[16px]">lock</span>Sent over an encrypted connection and never shown to other members.</p>';
+
+  const num=$('num'),go=$('go');
+  const digits=()=>num.value.replace(/\D/g,'').slice(0,11);
+  function sync(){
+    const d=digits();num.value=d.replace(/^(\d{0,4})(\d{0,3})(\d{0,4}).*/,(m,a,b,c)=>[a,b,c].filter(Boolean).join(' '));
+    $('prog').style.width=(d.length/11*100)+'%';$('cnt').textContent=d.length+'/11';
+    $('prog').className='bar h-full rounded-full '+(d.length===11?'bg-secondary':'bg-primary-container');
+    go.disabled=!(d.length===11&&$('ok').checked);go.style.opacity=go.disabled?'.55':'1';
+  }
+  function setType(t){
+    type=t;$('pill').style.transform=t==='nin'?'translateX(0)':'translateX(100%)';
+    view.querySelectorAll('[data-t]').forEach(b=>b.className='relative z-10 py-2 font-label-md text-label-md transition-colors '+(b.dataset.t===t?'text-on-primary':'text-on-surface-variant'));
+    $('lbl').textContent='Enter your '+(t==='nin'?'National Identification Number (NIN)':'Bank Verification Number (BVN)');$('hint').textContent=hints[t];$('err').textContent='';
+  }
+  view.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>setType(b.dataset.t));
+  num.oninput=sync;$('ok').onchange=sync;setType('nin');sync();
+
+  go.onclick=async()=>{
+    const d=digits();$('err').textContent='';
+    go.disabled=true;go.innerHTML='<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span><span>Verifying with '+(type==='nin'?'NIMC':'NIBSS')+'…</span>';
+    let r,j={};
+    try{
+      r=await fetch('/api/verify-kyc',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},body:JSON.stringify({type,number:d})});
+      j=await r.json().catch(()=>({}));
+    }catch(e){r=null}
+    if(!r||!r.ok){
+      const c=$('card');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');
+      $('err').textContent=(r&&j.message)||'We could not reach the verification service. Check your connection and try again.';
+      go.innerHTML='Verify identity';sync();return;
+    }
+    if(j.status==='verified'){
+      go.className='w-full h-[52px] rounded-full bg-secondary text-on-secondary font-label-lg text-label-lg flex items-center justify-center gap-2 pop';go.innerHTML='<span class="material-symbols-outlined">check_circle</span>Verified';
+      setTimeout(()=>done(type,d.slice(-4)),700);
+    }else if(j.status==='pending')pending();
+    else{
+      $('err').textContent=j.message||'Verification failed.';go.innerHTML='Verify identity';sync();
+      const c=$('card');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');
+    }
+  };
+})();
+</script></body></html>kyc
