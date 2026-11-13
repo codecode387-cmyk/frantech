@@ -24,14 +24,14 @@
     <div class="absolute -left-10 -bottom-10 w-40 h-40 rounded-full bg-secondary-fixed/15 blur-xl pointer-events-none"></div>
     <div class="relative z-10 flex flex-col gap-space-sm">
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-space-xs"><span class="font-label-md text-label-md text-on-primary-container tracking-wide">Monthly Commitment</span>
+        <div class="flex items-center gap-space-xs"><span class="font-label-md text-label-md text-on-primary-container tracking-wide">Total Contribution</span>
           <button id="eye" aria-label="Hide amount" class="p-1 rounded-full text-on-primary-container hover:bg-white/10 press flex items-center" type="button"><span id="eyeI" class="material-symbols-outlined text-[18px]">visibility</span></button></div>
         <div class="w-8 h-8 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">account_balance_wallet</span></div>
       </div>
       <span id="amt" class="font-currency-display text-currency-display tracking-tight select-none">₦0</span>
       <div class="flex items-center justify-between pt-1">
         <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 backdrop-blur-md"><span class="w-2 h-2 rounded-full bg-secondary-fixed animate-ping"></span><span id="ag" class="font-label-sm text-label-sm font-medium">Active Groups: 0</span></div>
-        <span id="vflag" class="font-label-sm text-label-sm text-on-primary-container font-medium flex items-center gap-0.5"></span>
+        <span class="font-label-sm text-label-sm text-on-primary-container font-medium">Confirmed payments</span>
       </div>
     </div>
   </section>
@@ -39,8 +39,8 @@
   <section class="rise grid grid-cols-4 gap-space-xs px-0.5" style="--i:3" id="actions"></section>
 
   <section class="flex flex-col gap-space-sm">
-    <div class="rise flex items-center justify-between" style="--i:4"><h2 class="font-headline-sm text-headline-sm">Popular Groups</h2><a href="groups.html" class="font-label-md text-label-md text-primary font-semibold flex items-center gap-0.5">See All<span class="material-symbols-outlined text-[16px]">arrow_forward</span></a></div>
-    <div id="pop" class="flex flex-col gap-space-sm"></div>
+    <div class="rise flex items-center justify-between" style="--i:4"><h2 class="font-headline-sm text-headline-sm">My Groups</h2><a href="groups.html" class="font-label-md text-label-md text-primary font-semibold flex items-center gap-0.5">Find groups<span class="material-symbols-outlined text-[16px]">arrow_forward</span></a></div>
+    <div id="mine" class="flex flex-col gap-space-sm"></div>
   </section>
 </div></main>
 <nav id="nav"></nav>
@@ -52,20 +52,15 @@
   $('greet').textContent=(h<12?'Good Morning':h<17?'Good Afternoon':'Good Evening')+',';
   $('uname').textContent=profile.full_name;
 
-  // Quick actions
-  const act=(href,ic,lb,fill)=>'<a href="'+href+'" class="group press flex flex-col items-center gap-1.5 text-center"><div class="w-14 h-14 rounded-2xl bg-surface-container-low shadow-[0_4px_16px_-2px_rgba(15,23,42,0.06)] flex items-center justify-center text-primary group-hover:bg-primary-container group-hover:text-on-primary transition-all"><span class="material-symbols-outlined text-[26px]"'+(fill?' style="font-variation-settings:\'FILL\' 1"':'')+'>'+ic+'</span></div><span class="font-label-sm text-label-sm font-semibold leading-tight">'+lb+'</span></a>';
-  $('actions').innerHTML=act('groups.html','person_add','Join Group')+act('groups.html#mine','diversity_3','My Groups')+act('kyc.html',k==='verified'?'verified':'verified_user',k==='verified'?'Verified':'Verify ID',true)+act('#','account_balance_wallet','Wallet',true);
-  $('actions').lastElementChild.onclick=e=>{e.preventDefault();App.toast('Wallet opens once payments are connected.')};
-  $('vflag').innerHTML=k==='verified'?'<span>ID verified</span><span class="material-symbols-outlined text-[14px]">verified</span>':(k==='pending'?'<span>Verification in review</span>':'<span>ID not verified</span>');
+  const act=(href,ic,lb)=>'<a href="'+href+'" class="group press flex flex-col items-center gap-1.5 text-center"><div class="w-14 h-14 rounded-2xl bg-surface-container-low shadow-[0_4px_16px_-2px_rgba(15,23,42,0.06)] flex items-center justify-center text-primary group-hover:bg-primary-container group-hover:text-on-primary transition-all"><span class="material-symbols-outlined text-[26px]">'+ic+'</span></div><span class="font-label-sm text-label-sm font-semibold leading-tight">'+lb+'</span></a>';
+  $('actions').innerHTML=act('groups.html','person_add','Join Group')+act('groups.html#mine','diversity_3','My Groups')+act('kyc.html',k==='verified'?'verified':'verified_user',k==='verified'?'Verified':'Verify ID')+act('#','notifications','Alerts');
+  $('actions').lastElementChild.onclick=e=>{e.preventDefault();App.openNotifs()};
 
-  // Balance eye
   let hid=false,amount=0;
   $('eye').onclick=()=>{hid=!hid;$('amt').textContent=hid?'₦ • • • • • •':App.money(amount);$('eyeI').textContent=hid?'visibility_off':'visibility'};
 
-  // Nudges
   const nz=$('nudges');
-  if(k==='none'||k==='rejected')nz.innerHTML+='<a href="kyc.html" class="rise press flex items-center gap-3 rounded-xl bg-surface-container-low p-3.5" style="--i:1"><div class="w-10 h-10 rounded-full bg-primary-fixed text-primary flex items-center justify-center pulse-ring"><span class="material-symbols-outlined text-[22px]">verified_user</span></div><div class="flex-1"><p class="font-label-lg text-label-lg">Verify your identity</p><p class="font-body-sm text-body-sm text-on-surface-variant">Add your NIN or BVN to start joining groups.</p></div><span class="material-symbols-outlined text-outline">chevron_right</span></a>';
-  if(k==='pending')nz.innerHTML+='<a href="kyc.html" class="rise press flex items-center gap-3 rounded-xl bg-surface-container-low p-3.5" style="--i:1"><span class="material-symbols-outlined text-primary text-[26px]">hourglass_top</span><div class="flex-1"><p class="font-label-lg text-label-lg">Verification under review</p><p class="font-body-sm text-body-sm text-on-surface-variant">Tap to check the status.</p></div></a>';
+  if(k==='none'||k==='rejected')nz.innerHTML+='<a href="kyc.html" class="rise press flex items-center gap-3 rounded-xl bg-surface-container-low p-3.5" style="--i:1"><div class="w-10 h-10 rounded-full bg-primary-fixed text-primary flex items-center justify-center pulse-ring"><span class="material-symbols-outlined text-[22px]">verified_user</span></div><div class="flex-1"><p class="font-label-lg text-label-lg">Verify your identity</p><p class="font-body-sm text-body-sm text-on-surface-variant">Needed for groups with larger payments.</p></div><span class="material-symbols-outlined text-outline">chevron_right</span></a>';
   if(await bio.supported()&&!bio.enabledFor(user.id)&&!localStorage.getItem('frantech_bio_dismissed')){
     const d=document.createElement('div');d.className='rise flex items-center gap-3 rounded-xl bg-surface-container-lowest p-3.5 shadow-sm';d.style.setProperty('--i',1);
     d.innerHTML='<span class="material-symbols-outlined text-primary text-[26px]">fingerprint</span><div class="flex-1"><p class="font-label-lg text-label-lg">Log in faster</p><p class="font-body-sm text-body-sm text-on-surface-variant">Use Face ID or your fingerprint.</p></div><button id="bOn" class="press px-3 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md" type="button">Turn on</button><button id="bNo" aria-label="Dismiss" class="text-outline" type="button"><span class="material-symbols-outlined text-[20px]">close</span></button>';
@@ -74,17 +69,32 @@
     $('bOn').onclick=async()=>{try{await bio.enable(user);sessionStorage.setItem('frantech_unlocked','1');d.remove();App.toast('Face ID / fingerprint is on.')}catch(e){App.toast('Could not turn it on on this device.',false)}};
   }
 
-  // Groups data
-  $('pop').innerHTML=[0,1,2].map(()=>'<div class="shimmer h-24 rounded-2xl"></div>').join('');
-  const {data,error}=await sb.rpc('groups_overview');
-  if(error){$('pop').innerHTML='<div class="rounded-xl bg-error-container text-on-error-container p-4 font-body-sm text-body-sm">Could not load groups. Run the SQL setup in Supabase first.</div>';return}
-  const all=(data||[]).filter(g=>g.status==='active'),mine=all.filter(g=>g.joined);
-  amount=mine.reduce((s,g)=>s+Math.floor(g.target_amount/g.months),0);
+  $('mine').innerHTML='<div class="shimmer h-28 rounded-2xl"></div><div class="shimmer h-28 rounded-2xl"></div>';
+  const [o,c]=await Promise.all([sb.rpc('groups_overview'),sb.from('contributions').select('group_id,period,amount,status,note').eq('user_id',user.id)]);
+  if(o.error){$('mine').innerHTML='<div class="rounded-xl bg-error-container text-on-error-container p-4 font-body-sm text-body-sm">Could not load your groups. Run admin-setup.sql in Supabase first.</div>';return}
+  const mine=(o.data||[]).filter(g=>g.joined&&g.status!=='completed'),contribs=c.data||[];
+  amount=contribs.filter(x=>x.status==='confirmed').reduce((s,x)=>s+Number(x.amount),0);
   App.count($('amt'),amount,App.money);$('ag').textContent='Active Groups: '+mine.length;
-  const ICON={land:'landscape',business:'storefront',education:'school',travel:'flight',family:'family_restroom'};
-  const top=all.slice().sort((a,b)=>b.member_count-a.member_count).slice(0,3);
-  $('pop').innerHTML=top.map((g,i)=>{const pct=Math.round(g.member_count/g.max_members*100);
-    return '<a href="groups.html" class="rise press block w-full rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_4px_18px_-2px_rgba(15,23,42,0.05)]" style="--i:'+(5+i)+'"><div class="flex items-start gap-space-md"><div class="w-14 h-14 rounded-xl bg-primary-fixed text-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[28px]">'+(ICON[g.category]||'groups')+'</span></div><div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-1"><h3 class="font-headline-sm text-headline-sm truncate">'+App.esc(g.title)+'</h3>'+(g.joined?'<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-semibold">Joined</span>':'<span class="px-2 py-0.5 rounded-full bg-secondary-fixed/40 text-on-secondary-fixed-variant font-label-sm text-label-sm font-semibold">Active</span>')+'</div><p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">'+App.money(g.target_amount)+' <span class="text-outline">•</span> '+g.months+' Months</p><div class="mt-2.5 flex items-center gap-space-sm"><div class="flex-1 h-2 rounded-full bg-surface-container overflow-hidden"><div class="bar h-full bg-primary-container rounded-full" style="width:0" data-w="'+pct+'"></div></div><span class="font-label-sm text-label-sm text-on-surface-variant font-semibold">'+pct+'%</span></div></div></div></a>'}).join('')||'<p class="font-body-md text-body-md text-on-surface-variant">No groups yet.</p>';
-  requestAnimationFrame(()=>requestAnimationFrame(()=>$('pop').querySelectorAll('.bar').forEach(b=>b.style.width=b.dataset.w+'%')));
+
+  // The big "payment due" alert
+  const info=g=>{
+    if(g.status==='open')return {c:'bg-surface-container-high text-on-surface-variant',ic:'hourglass_empty',t:'Waiting for members ('+g.member_count+'/'+g.max_members+')'};
+    const cur=App.cur(g);
+    if(cur===0)return {c:'bg-primary-fixed text-primary',ic:'event',t:'Starts '+App.fmtDate(new Date(g.start_date+'T00:00:00'))};
+    const x=contribs.find(y=>y.group_id===g.id&&y.period===cur);
+    if(x&&x.status==='confirmed'){
+      const nx=cur<g.max_members?App.due(g,cur+1):null;
+      return {c:'bg-secondary-fixed text-on-secondary-fixed',ic:'check_circle',t:'Paid for period '+cur+(nx?' · next '+App.fmtDate(nx):''),paid:true};
+    }
+    if(x&&x.status==='submitted')return {c:'bg-primary-fixed text-primary',ic:'hourglass_top',t:'Receipt under review'};
+    if(x&&x.status==='rejected')return {c:'bg-error-container text-on-error-container',ic:'error',t:'Receipt rejected. Upload again',alert:true};
+    const d=App.daysTo(App.due(g,cur));
+    return {c:'bg-error-container text-on-error-container',ic:'schedule',t:d===0?'Payment due today':'Overdue by '+Math.abs(d)+' day'+(Math.abs(d)>1?'s':''),alert:true};
+  };
+  const first=mine.map(g=>({g,i:info(g)})).find(x=>x.i.alert);
+  if(first)nz.insertAdjacentHTML('afterbegin','<a href="group.html?id='+first.g.id+'" class="rise press flex items-center gap-3 rounded-xl bg-error-container text-on-error-container p-3.5" style="--i:1"><span class="material-symbols-outlined text-[26px]">notification_important</span><div class="flex-1"><p class="font-label-lg text-label-lg">'+App.esc(first.i.t)+'</p><p class="font-body-sm text-body-sm">'+App.esc(first.g.title)+' · '+App.money(first.g.contribution_amount)+'. Tap to pay and upload your receipt.</p></div><span class="material-symbols-outlined">chevron_right</span></a>');
+
+  $('mine').innerHTML=mine.length?mine.map((g,i)=>{const s=info(g),cur=App.cur(g);
+    return '<a href="group.html?id='+g.id+'" class="rise press block w-full rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_4px_18px_-2px_rgba(15,23,42,0.05)]" style="--i:'+(5+Math.min(i,4))+'"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><h3 class="font-headline-sm text-headline-sm truncate">'+App.esc(g.title)+'</h3><p class="font-body-sm text-body-sm text-on-surface-variant">'+App.money(g.contribution_amount)+' per '+App.per(g)+' · Your number <strong class="text-on-surface">'+g.my_slot+'</strong>'+(cur===g.my_slot?' · <span class="text-primary font-semibold">your turn</span>':'')+'</p></div><span class="material-symbols-outlined text-outline">chevron_right</span></div><div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-label-md text-label-md '+s.c+'"><span class="material-symbols-outlined text-[16px]">'+s.ic+'</span>'+App.esc(s.t)+'</div></a>'}).join(''):'<div class="rise flex flex-col items-center text-center py-10 px-4 bg-surface-container-lowest rounded-2xl"><div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-outline mb-3"><span class="material-symbols-outlined text-[28px]">savings</span></div><h4 class="font-headline-sm text-headline-sm">You have not joined a group yet</h4><p class="font-body-sm text-body-sm text-on-surface-variant max-w-xs mt-1">Pick a group, choose your number and start saving.</p><a href="groups.html" class="press mt-4 px-5 py-2.5 rounded-full bg-primary text-on-primary font-label-md text-label-md">Browse groups</a></div>';
 })();
 </script></body></html>
