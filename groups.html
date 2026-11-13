@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en"><head><title>Groups – Frantech Ajo</title>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script><script src="theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script><script src="app.js"></script>
+</head>
+<body class="invisible bg-surface font-body-md text-on-surface antialiased min-h-screen">
+<header id="hdr"></header>
+<main class="pt-16 pb-28 px-margin"><div class="flex flex-col w-full pt-3">
+  <div class="rise mb-3" style="--i:0"><h1 class="font-headline-md text-headline-md leading-tight">Explore Groups</h1><p class="font-label-sm text-label-sm text-on-surface-variant">Rotational Esusu &amp; Capital Pools</p></div>
+
+  <div class="rise w-full bg-surface-container-low p-1 rounded-full flex mb-4" style="--i:1">
+    <button id="tab-active" class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all" type="button"></button>
+    <button id="tab-completed" class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all" type="button"></button>
+  </div>
+
+  <div id="kycBanner" class="mb-4"></div>
+
+  <div class="rise relative w-full mb-4" style="--i:2">
+    <span class="material-symbols-outlined text-outline absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px] pointer-events-none">search</span>
+    <input id="q" class="w-full h-12 pl-11 pr-10 rounded-xl bg-surface-container-lowest placeholder:text-outline font-body-md text-body-md shadow-[0_4px_20px_-2px_rgba(15,23,42,0.04)] focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Search pool or purpose..." type="text"/>
+    <button id="clr" class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-outline" type="button"><span class="material-symbols-outlined text-[16px]">close</span></button>
+  </div>
+
+  <div class="rise w-full overflow-x-auto -mx-margin px-margin mb-5" style="--i:3"><div id="pills" class="flex gap-2 min-w-max pb-1"></div></div>
+
+  <div id="list" class="flex flex-col gap-space-sm"></div>
+</div></main>
+<nav id="nav"></nav>
+
+<!-- Join sheet -->
+<div id="modal" class="fixed inset-0 z-[70] hidden items-end justify-center bg-inverse-surface/40 backdrop-blur-sm fade">
+  <div id="sheet" class="sheet w-full max-w-md bg-surface-container-lowest rounded-t-[28px] p-margin pb-8 shadow-2xl max-h-[88vh] overflow-y-auto"></div>
+</div>
+
+<script>
+(async()=>{
+  const {profile}=await App.init({title:'Groups',active:'groups'});
+  const ICON={land:'landscape',business:'storefront',education:'school',travel:'flight',family:'family_restroom'};
+  const CATS=[['all','All'],['land','Land'],['business','Business'],['education','Education'],['travel','Travel'],['family','Family']];
+  const THRESHOLD=50000;
+  const $=id=>document.getElementById(id);
+  let groups=[],cat='all',status='active',q='',mine=location.hash==='#mine';
+  const verified=profile.kyc_status==='verified';
+  const monthly=g=>Math.floor(g.target_amount/g.months);
+
+  // KYC banner
+  if(!verified){
+    const pend=profile.kyc_status==='pending';
+    $('kycBanner').innerHTML='<a href="kyc.html" class="rise press block rounded-xl bg-gradient-to-r from-primary to-primary-container text-on-primary p-4 shadow-[0_10px_25px_-4px_rgba(0,82,255,0.22)]" style="--i:2"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-[28px] text-secondary-fixed">'+(pend?'hourglass_top':'verified_user')+'</span><div class="flex-1"><p class="font-headline-sm text-headline-sm leading-snug">'+(pend?'Verification under review':'Verify your identity')+'</p><p class="font-body-sm text-body-sm text-on-primary-container">'+(pend?'We will unlock group joining once approved.':'Use your NIN or BVN to join pools above '+App.money(THRESHOLD)+' a month.')+'</p></div><span class="material-symbols-outlined">arrow_forward</span></div></a>';
+  }
+
+  // Category pills
+  function drawPills(){
+    $('pills').innerHTML=CATS.map(([k,l])=>'<button data-c="'+k+'" class="press px-4 py-2 rounded-full font-label-md text-label-md '+(cat===k?'bg-primary-container text-on-primary shadow-sm':'bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container')+'" type="button">'+l+'</button>').join('');
+    $('pills').querySelectorAll('button').forEach(b=>b.onclick=()=>{cat=b.dataset.c;drawPills();render()});
+  }
+  drawPills();
+
+  function drawTabs(){
+    const a=groups.filter(g=>g.status==='active').length,c=groups.filter(g=>g.status==='completed').length;
+    const on='flex-1 py-2 rounded-full font-label-md text-label-md transition-all bg-primary text-on-primary shadow-sm',off='flex-1 py-2 rounded-full font-label-md text-label-md transition-all text-on-surface-variant';
+    $('tab-active').textContent='Active ('+a+')';$('tab-completed').textContent='Completed ('+c+')';
+    $('tab-active').className=status==='active'?on:off;$('tab-completed').className=status==='completed'?on:off;
+  }
+  $('tab-active').onclick=()=>{status='active';drawTabs();render()};
+  $('tab-completed').onclick=()=>{status='completed';drawTabs();render()};
+  $('q').oninput=e=>{q=e.target.value.trim().toLowerCase();$('clr').classList.toggle('hidden',!q);render()};
+  $('clr').onclick=()=>{$('q').value='';q='';$('clr').classList.add('hidden');render()};
+
+  function skeleton(){$('list').innerHTML=[0,1,2].map(()=>'<div class="shimmer h-[148px] rounded-xl"></div>').join('')}
+
+  function card(g,i){
+    const full=g.member_count>=g.max_members,pct=Math.round(g.member_count/g.max_members*100),left=g.max_members-g.member_count;
+    let badge='<span class="px-2 py-0.5 rounded-full bg-secondary-fixed/30 text-secondary font-label-sm text-label-sm font-semibold shrink-0">Active</span>';
+    if(g.joined)badge='<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-semibold shrink-0">Joined</span>';
+    else if(full)badge='<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold shrink-0">Full</span>';
+    else if(g.status==='completed')badge='<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold shrink-0">Completed</span>';
+    let btn='';
+    if(g.status==='active'&&!g.joined&&!full)btn='<button data-join="'+g.id+'" class="press px-3.5 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container flex items-center gap-1" type="button"><span>Join</span><span class="material-symbols-outlined text-[15px]">arrow_forward</span></button>';
+    else if(g.joined)btn='<span class="flex items-center gap-1 text-secondary font-label-md text-label-md"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings:\'FILL\' 1">check_circle</span>Month '+(g.my_month||'')+'</span>';
+    const note=g.status!=='active'?'Archived cycle':(full?'Group is full':(left<=2?'<span class="text-error font-medium">Only '+left+' spot'+(left>1?'s':'')+' left</span>':g.member_count+' / '+g.max_members+' members joined'));
+    return '<article class="rise bg-surface-container-lowest p-4 rounded-xl shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)] hover:shadow-md transition-shadow" style="--i:'+Math.min(i,8)+'"><div class="flex items-start gap-3"><div class="w-12 h-12 rounded-xl bg-primary-fixed text-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[26px]">'+(ICON[g.category]||'groups')+'</span></div><div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-1"><h3 class="font-headline-sm text-headline-sm truncate">'+App.esc(g.title)+'</h3>'+badge+'</div><p class="font-label-md text-label-md text-on-surface-variant mt-0.5">'+App.money(g.target_amount)+' <span class="text-outline">·</span> '+g.months+' Months</p><div class="flex items-center justify-between mt-2 mb-1"><span class="font-label-sm text-label-sm text-on-surface-variant">Monthly: <strong class="text-on-surface font-semibold">'+App.money(monthly(g))+'</strong></span><span class="font-label-sm text-label-sm font-bold text-primary">'+pct+'% filled</span></div><div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden"><div class="bar h-full bg-secondary rounded-full" style="width:0" data-w="'+pct+'"></div></div></div></div><div class="flex items-center justify-between mt-3 bg-surface-container-low/50 -mx-4 -mb-4 px-4 py-2.5 rounded-b-xl"><div class="flex items-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px] text-secondary">group</span><span>'+note+'</span></div>'+btn+'</div></article>';
+  }
+
+  function render(){
+    const rows=groups.filter(g=>g.status===status&&(cat==='all'||g.category===cat)&&(!q||g.title.toLowerCase().includes(q))&&(!mine||g.joined));
+    $('list').innerHTML=rows.length?rows.map(card).join(''):'<div class="rise flex flex-col items-center text-center py-12 px-4 bg-surface-container-lowest rounded-xl"><div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-outline mb-3"><span class="material-symbols-outlined text-[32px]">savings</span></div><h4 class="font-headline-sm text-headline-sm">No groups found</h4><p class="font-body-sm text-body-sm text-on-surface-variant max-w-xs mt-1">'+(mine?'You have not joined a group yet.':'Try another keyword or category.')+'</p>'+(mine?'<button id="all" class="press mt-4 px-4 py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md" type="button">See all groups</button>':'')+'</div>';
+    if($('all'))$('all').onclick=()=>{mine=false;history.replaceState(null,'','groups.html');render()};
+    requestAnimationFrame(()=>requestAnimationFrame(()=>$('list').querySelectorAll('.bar').forEach(b=>b.style.width=b.dataset.w+'%')));
+    $('list').querySelectorAll('[data-join]').forEach(b=>b.onclick=()=>openJoin(groups.find(g=>g.id===b.dataset.join)));
+  }
+
+  async function load(){
+    skeleton();
+    const {data,error}=await sb.rpc('groups_overview');
+    if(error){$('list').innerHTML='<div class="rounded-xl bg-error-container text-on-error-container p-4 font-body-md text-body-md">Could not load groups. Make sure you have run the SQL setup in Supabase.<br><span class="font-body-sm text-body-sm">'+App.esc(error.message)+'</span></div>';return}
+    groups=data||[];drawTabs();render();
+  }
+
+  // Join sheet
+  function openJoin(g){
+    const m=$('modal'),s=$('sheet'),need=monthly(g)>THRESHOLD&&!verified;
+    const head='<div class="w-12 h-1.5 bg-surface-container-highest rounded-full mx-auto mb-4"></div><div class="flex items-start justify-between mb-4"><div><span class="px-2.5 py-0.5 rounded-full bg-secondary-fixed/40 text-secondary font-label-sm text-label-sm font-semibold">Frantech rotational pool</span><h3 class="font-headline-md text-headline-md mt-1">'+App.esc(g.title)+'</h3></div><button id="x" class="w-9 h-9 rounded-full bg-surface-container-low flex items-center justify-center" type="button"><span class="material-symbols-outlined text-[20px]">close</span></button></div>';
+    const stats='<div class="grid grid-cols-2 gap-3 mb-4"><div class="p-3 bg-surface-container-low rounded-xl"><span class="font-label-sm text-label-sm text-on-surface-variant block">Target pool</span><span class="font-headline-sm text-headline-sm text-primary font-bold">'+App.money(g.target_amount)+'</span></div><div class="p-3 bg-surface-container-low rounded-xl"><span class="font-label-sm text-label-sm text-on-surface-variant block">Monthly dues</span><span class="font-headline-sm text-headline-sm text-secondary font-bold">'+App.money(monthly(g))+'</span></div></div>';
+    if(need){
+      const pend=profile.kyc_status==='pending';
+      s.innerHTML=head+stats+'<div class="rounded-xl bg-surface-container-low p-4 flex gap-3 mb-4"><span class="material-symbols-outlined text-primary text-[26px]">'+(pend?'hourglass_top':'lock')+'</span><div><p class="font-label-lg text-label-lg">'+(pend?'Your verification is under review':'Verify your identity first')+'</p><p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">'+(pend?'You can join as soon as it is approved.':'Pools above '+App.money(THRESHOLD)+' a month need a verified NIN or BVN. It takes about a minute.')+'</p></div></div>'+(pend?'':'<a href="kyc.html?next=groups.html" class="press w-full h-12 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2">Verify with NIN or BVN<span class="material-symbols-outlined text-[20px]">arrow_forward</span></a>');
+    }else{
+      let sel=null;
+      const pills=Array.from({length:g.months},(_,i)=>i+1).map(n=>{const t=(g.taken||[]).includes(n);if(!t&&sel===null)sel=n;return '<button data-m="'+n+'" '+(t?'disabled':'')+' class="slot press py-2 rounded-xl font-label-md text-label-md '+(t?'bg-surface-container-low text-outline-variant line-through':'bg-surface-container-low text-on-surface-variant hover:bg-surface-container')+'" type="button">Month '+n+'</button>'}).join('');
+      s.innerHTML=head+stats+'<label class="font-label-md text-label-md block mb-2 font-semibold">Choose your payout month</label><div id="slots" class="grid grid-cols-4 gap-2 text-center mb-2">'+pills+'</div><p class="font-body-sm text-body-sm text-on-surface-variant mb-4 flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-primary">info</span>Crossed-out months are already taken.</p><p id="err" class="font-body-sm text-body-sm text-error min-h-[16px] mb-1"></p><button id="ok" class="press w-full h-[52px] rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg shadow-lg flex items-center justify-center gap-2" type="button">Confirm &amp; join</button><button id="later" class="w-full mt-2 py-2 text-on-surface-variant font-label-md text-label-md" type="button">Maybe later</button>';
+      const paint=()=>s.querySelectorAll('.slot').forEach(b=>{if(b.disabled)return;const on=+b.dataset.m===sel;b.className='slot press py-2 rounded-xl font-label-md text-label-md '+(on?'bg-primary text-on-primary shadow-md':'bg-surface-container-low text-on-surface-variant hover:bg-surface-container')});
+      paint();
+      s.querySelectorAll('.slot').forEach(b=>b.onclick=()=>{sel=+b.dataset.m;paint()});
+      $('later').onclick=close;
+      $('ok').onclick=async()=>{
+        if(!sel){$('err').textContent='No payout months are left in this group.';return}
+        const b=$('ok');b.disabled=true;b.innerHTML='<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>Joining…';$('err').textContent='';
+        const {error}=await sb.rpc('join_group',{p_group:g.id,p_month:sel});
+        if(error){
+          if(/KYC_REQUIRED/.test(error.message)){close();App.toast('Verify your identity to join this group.',false);setTimeout(()=>location.href='kyc.html?next=groups.html',900);return}
+          b.disabled=false;b.textContent='Confirm & join';$('err').textContent=error.message;await load();return;
+        }
+        b.className='w-full h-[52px] rounded-full bg-secondary text-on-secondary font-label-lg text-label-lg flex items-center justify-center gap-2 pop';b.innerHTML='<span class="material-symbols-outlined">check_circle</span>You joined '+App.esc(g.title);
+        setTimeout(async()=>{close();await load();App.toast('You are in. Payout month: Month '+sel+'.')},1100);
+      };
+    }
+    $('x').onclick=close;m.classList.remove('hidden');m.classList.add('flex');
+  }
+  function close(){$('modal').classList.add('hidden');$('modal').classList.remove('flex')}
+  $('modal').onclick=e=>{if(e.target.id==='modal')close()};
+
+  load();
+})();
+</script></body></html>
