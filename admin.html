@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en"><head><title>Admin – Frantech Ajo</title>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script><script src="theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script><script src="app.js"></script>
+</head>
+<body class="invisible bg-surface font-body-md text-on-surface antialiased min-h-screen">
+<header id="hdr"></header>
+<main class="pt-16 pb-28 px-margin"><div class="flex flex-col gap-space-md pt-3">
+  <div class="rise" style="--i:0"><span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold">Admin</span><h1 class="font-headline-md text-headline-md">Manage groups &amp; payments</h1></div>
+  <div id="tabs" class="rise w-full bg-surface-container-low p-1 rounded-full flex" style="--i:1"></div>
+  <div id="body" class="flex flex-col gap-space-sm"></div>
+</div></main>
+<nav id="nav"></nav>
+<datalist id="banks"><option value="Access Bank"><option value="GTBank"><option value="First Bank"><option value="UBA"><option value="Zenith Bank"><option value="Opay"><option value="Palmpay"><option value="Kuda"><option value="Moniepoint"><option value="Wema Bank"><option value="Sterling Bank"><option value="Fidelity Bank"><option value="Union Bank"><option value="Stanbic IBTC"><option value="FCMB"><option value="Polaris Bank"><option value="Ecobank"><option value="Keystone Bank"><option value="Providus Bank"><option value="Jaiz Bank"></datalist>
+<script>
+(async()=>{
+  const {profile,user}=await App.init({title:'Admin',active:'profile'});
+  if(!profile.is_admin){location.replace('dashboard.html');return}
+  const $=id=>document.getElementById(id), body=$('body');
+  let tab='groups',filter='submitted',D={groups:[],members:[],accts:[],contribs:[],payouts:[]},openMembers={},showForm=false,freq='weekly';
+  const inp='class="w-full h-12 px-4 rounded-xl bg-surface-container-low font-body-md text-body-md outline-none focus:ring-2 focus:ring-primary-container"';
+  const gname=id=>(D.groups.find(g=>g.id===id)||{}).title||'Group';
+  const mname=(gid,uid)=>(D.members.find(m=>m.group_id===gid&&m.user_id===uid)||{}).full_name||'Member';
+  const card='rounded-xl bg-surface-container-lowest p-space-md shadow-[0_4px_20px_-2px_rgba(15,23,42,0.05)]';
+
+  async function load(){
+    const [g,m,a,c,p]=await Promise.all([sb.from('groups').select('*').order('created_at',{ascending:false}),sb.from('group_members').select('*').order('slot'),sb.from('group_accounts').select('*'),sb.from('contributions').select('*').order('submitted_at',{ascending:false}),sb.from('payouts').select('*')]);
+    if(g.error){body.innerHTML='<div class="rounded-xl bg-error-container text-on-error-container p-4 font-body-md text-body-md">Run admin-setup.sql in Supabase first.<br>'+App.esc(g.error.message)+'</div>';return}
+    D={groups:g.data||[],members:m.data||[],accts:a.data||[],contribs:c.data||[],payouts:p.data||[]};
+    draw();
+  }
+  function tabs(){
+    const pend=D.contribs.filter(c=>c.status==='submitted').length;
+    $('tabs').innerHTML=[['groups','Groups'],['receipts','Receipts'+(pend?' ('+pend+')':'')],['payouts','Payouts']].map(([k,l])=>'<button data-t="'+k+'" class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all '+(tab===k?'bg-primary text-on-primary shadow-sm':'text-on-surface-variant')+'" type="button">'+l+'</button>').join('');
+    $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;draw()});
+  }
+  const draw=()=>{tabs();({groups:drawGroups,receipts:drawReceipts,payouts:drawPayouts})[tab]()};
+
+  // ---------------- Groups ----------------
+  function drawGroups(){
+    let h='<button id="nf" class="press w-full h-12 rounded-full '+(showForm?'bg-surface-container-high text-on-surface':'bg-primary-container text-on-primary')+' font-label-lg text-label-lg flex items-center justify-center gap-2" type="button"><span class="material-symbols-outlined text-[20px]">'+(showForm?'close':'add')+'</span>'+(showForm?'Cancel':'Post a new group')+'</button>';
+    if(showForm)h+='<form id="gf" class="rise '+card+' flex flex-col gap-3" novalidate><div><label class="font-label-md text-label-md block mb-1">Group name</label><input id="gt" '+inp+' placeholder="e.g. Weekly Ajo – 10 people"/></div>'+
+      '<div><label class="font-label-md text-label-md block mb-1">Category</label><select id="gc" '+inp+'><option value="family">Family</option><option value="business">Business</option><option value="land">Land</option><option value="education">Education</option><option value="travel">Travel</option><option value="other">Other</option></select></div>'+
+      '<div><label class="font-label-md text-label-md block mb-1">Contribution amount (₦)</label><input id="ga" '+inp+' inputmode="numeric" placeholder="e.g. 10000"/></div>'+
+      '<div><label class="font-label-md text-label-md block mb-1">How often do members pay?</label><div class="relative grid grid-cols-2 p-1 rounded-full bg-surface-container-low"><div id="fp" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-primary-container shadow transition-transform duration-300"></div><button type="button" data-f="weekly" class="relative z-10 py-2 font-label-md text-label-md">Weekly</button><button type="button" data-f="monthly" class="relative z-10 py-2 font-label-md text-label-md">Monthly</button></div></div>'+
+      '<div><label class="font-label-md text-label-md block mb-1">Number of members</label><input id="gm" '+inp+' inputmode="numeric" placeholder="e.g. 10"/><p id="gh" class="font-body-sm text-body-sm text-on-surface-variant mt-1"></p></div>'+
+      '<p class="font-label-lg text-label-lg pt-1">Account members will pay into</p>'+
+      '<div><label class="font-label-md text-label-md block mb-1">Bank</label><input id="gb" list="banks" '+inp+'/></div><div><label class="font-label-md text-label-md block mb-1">Account number</label><input id="gn" '+inp+' inputmode="numeric" maxlength="10"/></div><div><label class="font-label-md text-label-md block mb-1">Account name</label><input id="gan" '+inp+'/></div>'+
+      '<p id="ge" class="font-body-sm text-body-sm text-error min-h-[16px]"></p><button id="gs" class="press h-[52px] rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg" type="button">Post group</button></form>';
+    h+=D.groups.length?D.groups.map((g,i)=>{
+      const mem=D.members.filter(m=>m.group_id===g.id),ac=D.accts.find(a=>a.group_id===g.id),full=mem.length>=g.max_members;
+      const badge={open:['Open','bg-secondary-fixed/40 text-secondary'],active:['Running','bg-primary-fixed text-primary'],completed:['Completed','bg-surface-container-high text-on-surface-variant']}[g.status];
+      return '<div class="rise '+card+'" style="--i:'+Math.min(i,6)+'"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><h3 class="font-headline-sm text-headline-sm truncate">'+App.esc(g.title)+'</h3><p class="font-body-sm text-body-sm text-on-surface-variant">'+App.money(g.contribution_amount)+' per '+App.per(g)+' · '+mem.length+'/'+g.max_members+' joined</p></div><span class="px-2.5 py-1 rounded-full font-label-sm text-label-sm font-semibold '+badge[1]+'">'+badge[0]+'</span></div>'+
+        (ac?'<p class="font-body-sm text-body-sm text-on-surface-variant mt-2">Pay to: <strong class="text-on-surface">'+App.esc(ac.bank_name)+' · '+App.esc(ac.account_number)+' · '+App.esc(ac.account_name)+'</strong></p>':'')+
+        (g.start_date?'<p class="font-body-sm text-body-sm text-on-surface-variant">Started '+App.fmtDate(new Date(g.start_date+'T00:00:00'))+'</p>':'')+
+        '<div class="flex flex-wrap gap-2 mt-3"><button data-mem="'+g.id+'" class="press px-3.5 py-2 rounded-full bg-surface-container-low text-primary font-label-md text-label-md" type="button">'+(openMembers[g.id]?'Hide members':'Members ('+mem.length+')')+'</button>'+
+        (g.status==='open'?'<button data-start="'+g.id+'" '+(full?'':'disabled')+' class="press px-3.5 py-2 rounded-full bg-primary-container text-on-primary font-label-md text-label-md '+(full?'':'opacity-50')+'" type="button">Start group</button><button data-del="'+g.id+'" class="press px-3.5 py-2 rounded-full bg-error-container text-on-error-container font-label-md text-label-md" type="button">Delete</button>':'')+'</div>'+
+        (g.status==='open'&&!full?'<p class="font-body-sm text-body-sm text-outline mt-2">You can start the group when all '+g.max_members+' numbers are taken.</p>':'')+
+        '<div id="st-'+g.id+'"></div>'+
+        (openMembers[g.id]?'<div class="mt-3 flex flex-col gap-2">'+(mem.length?mem.map(m=>'<div class="rounded-lg bg-surface-container-low p-2.5"><p class="font-label-lg text-label-lg">#'+m.slot+' · '+App.esc(m.full_name)+'</p><p class="font-body-sm text-body-sm text-on-surface-variant">'+App.esc(m.bank_name)+' · '+App.esc(m.account_number)+' · '+App.esc(m.account_name)+'</p></div>').join(''):'<p class="font-body-sm text-body-sm text-on-surface-variant">No members yet.</p>')+'</div>':'')+'</div>';
+    }).join(''):'<div class="rise '+card+' text-center py-8"><span class="material-symbols-outlined text-outline text-[36px]">groups</span><p class="font-headline-sm text-headline-sm mt-2">No groups yet</p><p class="font-body-sm text-body-sm text-on-surface-variant">Post your first group above. It will show up on the Groups page straight away.</p></div>';
+    body.innerHTML=h;
+    $('nf').onclick=()=>{showForm=!showForm;drawGroups()};
+    if(showForm)wireForm();
+    body.querySelectorAll('[data-mem]').forEach(b=>b.onclick=()=>{openMembers[b.dataset.mem]=!openMembers[b.dataset.mem];drawGroups()});
+    body.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Delete this group and its members?'))return;const {error}=await sb.from('groups').delete().eq('id',b.dataset.del);error?App.toast(error.message,false):(App.toast('Group deleted.'),load())});
+    body.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{
+      const box=$('st-'+b.dataset.start),t=new Date().toLocaleDateString('en-CA',{timeZone:'Africa/Lagos'});
+      box.innerHTML='<div class="fade mt-3 rounded-xl bg-surface-container-low p-3 flex flex-col gap-2"><label class="font-label-md text-label-md">First payment date</label><input id="sd" type="date" min="'+t+'" value="'+t+'" '+inp+'/><button id="sg" class="press h-11 rounded-full bg-primary-container text-on-primary font-label-md text-label-md" type="button">Start and notify members</button></div>';
+      $('sg').onclick=async()=>{const {error}=await sb.rpc('start_group',{p_group:b.dataset.start,p_start:$('sd').value||t});error?App.toast(error.message,false):(App.toast('Group started. Members were notified.'),load())};
+    });
+  }
+  function wireForm(){
+    const paint=()=>{$('fp').style.transform=freq==='weekly'?'none':'translateX(100%)';body.querySelectorAll('[data-f]').forEach(b=>b.className='relative z-10 py-2 font-label-md text-label-md '+(b.dataset.f===freq?'text-on-primary':'text-on-surface-variant'))};
+    body.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{freq=b.dataset.f;paint();hint()});paint();
+    const hint=()=>{const a=+$('ga').value.replace(/\D/g,''),n=+$('gm').value;$('gh').textContent=(a&&n>1)?'Runs for '+n+' '+(freq==='weekly'?'weeks':'months')+'. Each member receives '+App.money(a*n)+' on their turn.':''};
+    $('ga').oninput=hint;$('gm').oninput=hint;$('gn').oninput=e=>e.target.value=e.target.value.replace(/\D/g,'').slice(0,10);
+    $('gs').onclick=async()=>{
+      const t=$('gt').value.trim(),a=+$('ga').value.replace(/\D/g,''),n=+$('gm').value,b=$('gb').value.trim(),an=$('gn').value,anm=$('gan').value.trim(),e=$('ge');
+      const bad=x=>{e.textContent=x;const f=$('gf');f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake')};
+      if(t.length<3)return bad('Enter a group name.');if(!a)return bad('Enter the contribution amount.');
+      if(!(n>=2&&n<=60))return bad('Members must be between 2 and 60.');if(b.length<2)return bad('Enter the bank.');
+      if(!/^\d{10}$/.test(an))return bad('Account number must be 10 digits.');if(anm.length<2)return bad('Enter the account name.');
+      const s=$('gs');s.disabled=true;s.textContent='Posting…';e.textContent='';
+      const r=await sb.from('groups').insert({title:t,category:$('gc').value,contribution_amount:a,frequency:freq,max_members:n,created_by:user.id}).select('id').single();
+      if(r.error){s.disabled=false;s.textContent='Post group';return bad(r.error.message)}
+      const r2=await sb.from('group_accounts').insert({group_id:r.data.id,bank_name:b,account_number:an,account_name:anm});
+      if(r2.error){await sb.from('groups').delete().eq('id',r.data.id);s.disabled=false;s.textContent='Post group';return bad(r2.error.message)}
+      showForm=false;App.toast('Group posted. Members can now see it.');load();
+    };
+  }
+
+  // ---------------- Receipts ----------------
+  async function drawReceipts(){
+    const rows=D.contribs.filter(c=>c.status===filter);
+    let h='<div class="flex gap-2">'+[['submitted','Pending'],['confirmed','Confirmed'],['rejected','Rejected']].map(([k,l])=>'<button data-fl="'+k+'" class="press px-4 py-2 rounded-full font-label-md text-label-md '+(filter===k?'bg-primary-container text-on-primary':'bg-surface-container-lowest text-on-surface-variant')+'" type="button">'+l+' ('+D.contribs.filter(c=>c.status===k).length+')</button>').join('')+'</div>';
+    h+=rows.length?rows.map((c,i)=>'<div class="rise '+card+'" style="--i:'+Math.min(i,6)+'"><div class="flex gap-3"><button data-view="'+c.id+'" class="press w-20 h-20 rounded-lg bg-surface-container shrink-0 overflow-hidden flex items-center justify-center text-primary" type="button"><span id="th-'+c.id+'" class="material-symbols-outlined text-[28px]">'+(/\.pdf$/.test(c.receipt_path)?'picture_as_pdf':'image')+'</span></button><div class="min-w-0 flex-1"><p class="font-label-lg text-label-lg truncate">'+App.esc(mname(c.group_id,c.user_id))+'</p><p class="font-body-sm text-body-sm text-on-surface-variant truncate">'+App.esc(gname(c.group_id))+' · Period '+c.period+'</p><p class="font-body-sm text-body-sm text-on-surface-variant">'+App.money(c.amount)+' · '+App.ago(c.submitted_at)+'</p>'+(c.note?'<p class="font-body-sm text-body-sm text-error">'+App.esc(c.note)+'</p>':'')+'</div></div>'+
+      (c.status==='submitted'?'<div class="grid grid-cols-2 gap-2 mt-3"><button data-ok="'+c.id+'" class="press h-11 rounded-full bg-secondary text-on-secondary font-label-md text-label-md flex items-center justify-center gap-1" type="button"><span class="material-symbols-outlined text-[18px]">check_circle</span>Payment received</button><button data-no="'+c.id+'" class="press h-11 rounded-full bg-error-container text-on-error-container font-label-md text-label-md" type="button">Reject</button></div>':'')+'</div>').join(''):'<div class="rise '+card+' text-center py-8"><span class="material-symbols-outlined text-outline text-[36px]">receipt_long</span><p class="font-headline-sm text-headline-sm mt-2">Nothing here</p><p class="font-body-sm text-body-sm text-on-surface-variant">Receipts members upload will appear here.</p></div>';
+    body.innerHTML=h;
+    body.querySelectorAll('[data-fl]').forEach(b=>b.onclick=()=>{filter=b.dataset.fl;drawReceipts()});
+    body.querySelectorAll('[data-ok]').forEach(b=>b.onclick=()=>review(b.dataset.ok,true));
+    body.querySelectorAll('[data-no]').forEach(b=>b.onclick=()=>{const n=prompt('Why is this receipt rejected? (the member will see this)','The receipt is not clear. Please upload it again.');if(n!==null)review(b.dataset.no,false,n)});
+    // signed links (private bucket)
+    const paths=rows.map(c=>c.receipt_path);if(!paths.length)return;
+    const {data}=await sb.storage.from('receipts').createSignedUrls(paths,900);
+    const url={};(data||[]).forEach(x=>{if(x.signedUrl)url[x.path]=x.signedUrl});
+    rows.forEach(c=>{const u=url[c.receipt_path],t=$('th-'+c.id);if(u&&t&&!/\.pdf$/.test(c.receipt_path))t.outerHTML='<img src="'+u+'" alt="Receipt" class="w-full h-full object-cover"/>'});
+    body.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{const c=D.contribs.find(x=>x.id===b.dataset.view),u=url[c.receipt_path];if(!u)return App.toast('Could not open the receipt.',false);
+      if(/\.pdf$/.test(c.receipt_path))return window.open(u,'_blank');
+      const w=document.createElement('div');w.className='fixed inset-0 z-[90] bg-black/85 flex items-center justify-center p-4 fade';w.innerHTML='<img src="'+u+'" class="max-w-full max-h-full rounded-lg"/>';w.onclick=()=>w.remove();document.body.appendChild(w)});
+  }
+  async function review(id,ok,note){
+    const {error}=await sb.rpc('review_receipt',{p_id:id,p_confirm:ok,p_note:note||null});
+    if(error)return App.toast(error.message,false);
+    App.toast(ok?'Marked as received. The member sees it as paid.':'Receipt rejected. The member was notified.');load();
+  }
+
+  // ---------------- Payouts ----------------
+  function drawPayouts(){
+    const act=D.groups.filter(g=>g.status==='active');
+    if(!act.length){body.innerHTML='<div class="rise '+card+' text-center py-8"><span class="material-symbols-outlined text-outline text-[36px]">payments</span><p class="font-headline-sm text-headline-sm mt-2">No running groups</p><p class="font-body-sm text-body-sm text-on-surface-variant">Payouts show here once a group has started.</p></div>';return}
+    body.innerHTML=act.map(g=>{
+      const cur=App.cur(g),mem=D.members.filter(m=>m.group_id===g.id);
+      let rows='';
+      for(let k=cur;k>=1;k--){
+        const r=mem.find(m=>m.slot===k),paid=D.payouts.find(p=>p.group_id===g.id&&p.period===k);
+        const ok=D.contribs.filter(c=>c.group_id===g.id&&c.period===k&&c.status==='confirmed'),waiting=mem.filter(m=>!ok.some(c=>c.user_id===m.user_id));
+        rows+='<div class="rounded-xl bg-surface-container-low p-3"><div class="flex items-center justify-between gap-2"><p class="font-label-lg text-label-lg">Period '+k+' → #'+k+' '+App.esc(r?r.full_name:'—')+'</p><span class="font-label-sm text-label-sm font-semibold '+(ok.length===g.max_members?'text-secondary':'text-on-surface-variant')+'">'+ok.length+'/'+g.max_members+' paid</span></div>'+
+          (r?'<div class="flex items-center justify-between mt-1"><p class="font-body-sm text-body-sm text-on-surface-variant">'+App.esc(r.bank_name)+' · <strong class="text-on-surface">'+App.esc(r.account_number)+'</strong> · '+App.esc(r.account_name)+'</p><button data-cp="'+r.account_number+'" class="press text-primary" type="button" aria-label="Copy account number"><span class="material-symbols-outlined text-[18px]">content_copy</span></button></div>':'')+
+          (waiting.length&&!paid?'<p class="font-body-sm text-body-sm text-error mt-1">Waiting on: '+waiting.map(m=>App.esc(m.full_name)).join(', ')+'</p>':'')+
+          '<p class="font-label-md text-label-md mt-1.5">Amount: '+App.money(g.contribution_amount*g.max_members)+'</p>'+
+          (paid?'<p class="font-label-md text-label-md text-secondary mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings:\'FILL\' 1">check_circle</span>Payout sent '+App.ago(paid.sent_at)+'</p>':'<button data-po="'+g.id+':'+k+':'+(ok.length<g.max_members?1:0)+'" class="press mt-2 w-full h-11 rounded-full '+(ok.length<g.max_members?'bg-surface-container-high text-on-surface':'bg-primary-container text-on-primary')+' font-label-md text-label-md" type="button">'+(ok.length<g.max_members?'Mark payout sent anyway':'Mark payout sent')+'</button>')+'</div>';
+      }
+      const nx=cur<g.max_members?'Next period starts '+App.fmtDate(App.due(g,cur+1)):'Final period';
+      return '<div class="rise '+card+'"><h3 class="font-headline-sm text-headline-sm">'+App.esc(g.title)+'</h3><p class="font-body-sm text-body-sm text-on-surface-variant mb-3">Now in period '+cur+' of '+g.max_members+' · '+nx+'</p><div class="flex flex-col gap-2">'+(rows||'<p class="font-body-sm text-body-sm text-on-surface-variant">The first period has not started yet.</p>')+'</div></div>';
+    }).join('');
+    body.querySelectorAll('[data-cp]').forEach(b=>b.onclick=()=>App.copy(b.dataset.cp));
+    body.querySelectorAll('[data-po]').forEach(b=>b.onclick=async()=>{
+      const [g,k,force]=b.dataset.po.split(':');
+      if(force==='1'&&!confirm('Not everyone has paid for this period. Mark the payout as sent anyway?'))return;
+      if(force!=='1'&&!confirm('Confirm you have sent this payout?'))return;
+      b.disabled=true;const {error}=await sb.rpc('mark_payout_sent',{p_group:g,p_period:+k,p_force:force==='1'});
+      error?(App.toast(error.message,false),b.disabled=false):(App.toast('Payout recorded. The member was notified.'),load());
+    });
+  }
+  load();
+})();
+</script></body></html>
