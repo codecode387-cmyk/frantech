@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en"><head><title>Log in – Frantech Ajo</title>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#00319E}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:#131b2e}
+main{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:calc(20px + env(safe-area-inset-top,0)) 20px calc(20px + env(safe-area-inset-bottom,0));background:linear-gradient(#0052FF,#0047E0 55%,#00319E)}
+.back{color:#fff;opacity:.9;text-decoration:none;font-size:14px;margin-bottom:22px;width:fit-content}
+h1{color:#fff;font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:rgba(255,255,255,.8);font-size:14px;margin:0 0 20px}
+.card{background:#fff;border-radius:24px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:in .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes in{from{opacity:0;transform:translateY(26px)}}
+form{display:flex;flex-direction:column;gap:12px}
+input[type=text],input[type=email],input[type=tel],input[type=password]{width:100%;height:50px;border-radius:14px;border:1.5px solid #c3c5d9;padding:0 14px;font:500 15px 'Plus Jakarta Sans',sans-serif;color:#131b2e;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus{border-color:#0052FF;box-shadow:0 0 0 3px rgba(0,82,255,.18)}
+.pw{position:relative}.pw button{position:absolute;right:6px;top:6px;height:38px;padding:0 10px;border:0;background:none;color:#0052FF;font:600 13px 'Plus Jakarta Sans',sans-serif;cursor:pointer}
+.primary{height:52px;border:0;border-radius:999px;background:#0052FF;color:#fff;font:700 15px 'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:transform .15s}
+.primary:active{transform:scale(.98)}.primary:disabled{opacity:.6}
+.ghost{height:52px;border-radius:999px;border:1.5px solid #0052FF;background:#fff;color:#0052FF;font:700 15px 'Plus Jakarta Sans',sans-serif;cursor:pointer}
+.link{background:none;border:0;color:#0052FF;font:600 13px 'Plus Jakarta Sans',sans-serif;cursor:pointer;padding:4px}
+.msg{font-size:13px;min-height:18px;margin:0}.err{color:#ba1a1a}.ok{color:#006c47}
+.foot{text-align:center;font-size:14px;color:#434656;margin:14px 0 0}.foot a{color:#0052FF;font-weight:700;text-decoration:none}
+.chk{display:flex;gap:8px;font-size:12px;color:#434656;align-items:flex-start}.chk input{margin-top:2px;accent-color:#0052FF}
+.shake{animation:shake .4s}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.hide{display:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head><body><main>
+<a class="back" href="index.html">&larr; Back</a>
+<h1 id="t">Welcome back</h1><p class="sub" id="s">Log in to continue saving with your circle.</p>
+
+<div class="card">
+  <!-- Biometric unlock (shown when this device has Face ID / fingerprint set up) -->
+  <div id="bioBox" class="hide" style="display:flex;flex-direction:column;gap:12px">
+    <button class="primary" id="bioBtn" type="button">Unlock with Face ID / fingerprint</button>
+    <p class="msg" id="bioMsg" role="status"></p>
+    <button class="link" id="usePw" type="button">Use password instead</button>
+  </div>
+
+  <form id="f" novalidate>
+    <input id="email" type="email" placeholder="Email address" autocomplete="email"/>
+    <div class="pw"><input id="pass" type="password" placeholder="Password" autocomplete="current-password"/><button type="button" id="eye">Show</button></div>
+    <p class="msg" id="msg" role="status"></p>
+    <button class="primary" id="go">Log in</button>
+    <button class="link" id="forgot" type="button">Forgot password?</button>
+  </form>
+
+  <form id="rf" class="hide" novalidate>
+    <input id="np" type="password" placeholder="New password (min. 8 characters)" autocomplete="new-password"/>
+    <p class="msg" id="rmsg" role="status"></p>
+    <button class="primary">Save new password</button>
+  </form>
+  <p class="foot" id="foot">New here? <a href="signup.html">Create an account</a></p>
+</div>
+</main>
+<script>
+const $=i=>document.getElementById(i);
+const say=(id,t,ok)=>{$(id).textContent=t;$(id).className="msg "+(ok?"ok":"err")};
+function fail(t){say("msg",t);const f=$("f");f.classList.remove("shake");void f.offsetWidth;f.classList.add("shake")}
+const enter=()=>location.href="dashboard.html";
+$("eye").onclick=()=>{const p=$("pass"),s=p.type==="password";p.type=s?"text":"password";$("eye").textContent=s?"Hide":"Show"};
+
+// Password login
+$("f").onsubmit=async e=>{
+  e.preventDefault();
+  const email=$("email").value.trim(),password=$("pass").value;
+  if(!/^\S+@\S+\.\S+$/.test(email))return fail("Enter a valid email address.");
+  if(!password)return fail("Enter your password.");
+  const b=$("go");b.disabled=true;b.textContent="Logging in…";say("msg","");
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  if(error){b.disabled=false;b.textContent="Log in";return fail(/invalid login/i.test(error.message)?"Wrong email or password.":error.message)}
+  sessionStorage.setItem("frantech_unlocked","1");say("msg","Logged in. Redirecting…",true);setTimeout(enter,500);
+};
+
+// Forgot password
+$("forgot").onclick=async()=>{
+  const email=$("email").value.trim();
+  if(!email)return fail("Enter your email first, then tap Forgot password.");
+  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+"/login.html"});
+  error?fail(error.message):say("msg","Reset link sent. Check your email.",true);
+};
+// Set new password after opening the reset link
+sb.auth.onAuthStateChange(ev=>{if(ev==="PASSWORD_RECOVERY"){
+  $("f").classList.add("hide");$("bioBox").classList.add("hide");$("foot").classList.add("hide");
+  $("rf").classList.remove("hide");$("t").textContent="Set a new password";$("s").textContent="Choose a password you haven't used before."}});
+$("rf").onsubmit=async e=>{
+  e.preventDefault();const p=$("np").value;
+  if(p.length<8)return say("rmsg","Password must be at least 8 characters.");
+  const {error}=await sb.auth.updateUser({password:p});
+  if(error)return say("rmsg",error.message);
+  sessionStorage.setItem("frantech_unlocked","1");say("rmsg","Password updated. Redirecting…",true);setTimeout(enter,700);
+};
+
+// Biometric unlock
+async function tryBio(){
+  say("bioMsg","");
+  try{await bio.verify();say("bioMsg","Unlocked.",true);enter()}
+  catch(e){say("bioMsg","Couldn't verify. Try again or use your password.")}
+}
+$("bioBtn").onclick=tryBio;
+$("usePw").onclick=()=>{$("bioBox").classList.add("hide");$("f").classList.remove("hide")};
+
+(async()=>{
+  if(location.hash.includes("type=recovery"))return;
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session)return;
+  if(await bio.supported()&&bio.enabledFor(session.user.id)){
+    $("f").classList.add("hide");$("bioBox").classList.remove("hide");$("bioBox").style.display="flex";
+    tryBio();
+  }else{sessionStorage.setItem("frantech_unlocked","1");enter()}
+})();
+</script></body></html>
